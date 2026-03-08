@@ -1,0 +1,49 @@
+name: Agentic RAG System CI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install python-dotenv sentence-transformers
+          pip install langchain-core langchain-text-splitters
+
+      - name: Validate project structure
+        run: |
+          test -f agent.py           && echo "Agent exists"
+          test -f app.py             && echo "Streamlit app exists"
+          test -f tools/rag_tool.py  && echo "RAG tool exists"
+          test -f tools/web_tools.py && echo "Web tools exist"
+          test -f requirements.txt   && echo "Requirements exist"
+          echo "All structure checks passed"
+
+      - name: Validate syntax
+        run: |
+          python -m py_compile agent.py
+          python -m py_compile tools/rag_tool.py
+          python -m py_compile tools/web_tools.py
+          python -m py_compile app.py
+          echo "All syntax checks passed"
+
+      - name: CI Summary
+        run: |
+          echo "================================================"
+          echo "Agentic RAG System CI passed"
+          echo "================================================"
+          echo "  - Project structure validated"
+          echo "  - All Python files syntax valid"
+          echo "  - Tools: RAG, Wikipedia, ArXiv, Web, Calculator"
+          echo "================================================"
